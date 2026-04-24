@@ -7,9 +7,20 @@
 
 const express = require('express');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = 3000;
+
+// Basic rate limiter — prevents accidental DoS on the local server
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 200,            // max 200 requests per minute per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
 
 // Parse JSON request bodies
 app.use(express.json());

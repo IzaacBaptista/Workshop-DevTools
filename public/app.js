@@ -11,6 +11,7 @@
 
 /**
  * Shows a formatted response inside a card's response box.
+ * Uses DOM APIs (not innerHTML) to avoid XSS.
  * @param {string} elementId - The id of the response-box div.
  * @param {number} status    - HTTP status code.
  * @param {object} body      - Parsed response JSON.
@@ -18,18 +19,32 @@
 function showResponse(elementId, status, body) {
   const box = document.getElementById(elementId);
   const statusClass = status >= 500 ? 'status-5xx' : status >= 400 ? 'status-4xx' : 'status-200';
-  box.innerHTML =
-    `<span class="${statusClass}">HTTP ${status}</span>\n` +
-    JSON.stringify(body, null, 2);
+
+  box.textContent = '';
+
+  const statusSpan = document.createElement('span');
+  statusSpan.className = statusClass;
+  statusSpan.textContent = `HTTP ${status}`;
+  box.appendChild(statusSpan);
+  box.appendChild(document.createTextNode('\n' + JSON.stringify(body, null, 2)));
+
   box.classList.add('visible');
 }
 
 /**
  * Shows an error message directly from a caught exception.
+ * Uses textContent to avoid XSS.
  */
 function showError(elementId, message) {
   const box = document.getElementById(elementId);
-  box.innerHTML = `<span class="status-5xx">Erro: ${message}</span>`;
+
+  box.textContent = '';
+
+  const span = document.createElement('span');
+  span.className = 'status-5xx';
+  span.textContent = `Erro: ${message}`;
+  box.appendChild(span);
+
   box.classList.add('visible');
 }
 
@@ -47,7 +62,7 @@ function toggleAnswer(elementId) {
 // ---------------------------------------------------------------------------
 async function scenario500() {
   const box = document.getElementById('res-500');
-  box.innerHTML = 'Aguardando resposta…';
+  box.textContent = 'Aguardando resposta…';
   box.classList.add('visible');
 
   try {
@@ -69,7 +84,7 @@ async function scenario500() {
 // ---------------------------------------------------------------------------
 async function scenario422() {
   const box = document.getElementById('res-422');
-  box.innerHTML = 'Enviando formulário…';
+  box.textContent = 'Enviando formulário…';
   box.classList.add('visible');
 
   try {
@@ -92,7 +107,7 @@ async function scenario422() {
 // ---------------------------------------------------------------------------
 async function scenario401() {
   const box = document.getElementById('res-401');
-  box.innerHTML = 'Carregando perfil…';
+  box.textContent = 'Carregando perfil…';
   box.classList.add('visible');
 
   try {
@@ -113,7 +128,7 @@ async function scenario401() {
 // ---------------------------------------------------------------------------
 async function scenario403() {
   const box = document.getElementById('res-403');
-  box.innerHTML = 'Executando ação administrativa…';
+  box.textContent = 'Executando ação administrativa…';
   box.classList.add('visible');
 
   try {
@@ -139,12 +154,19 @@ function scenarioJSError() {
     // The next line will throw: TypeError: Cannot read properties of undefined
     console.log('Tentando acessar usuário:', usuario.nome);
 
-    box.innerHTML = 'Dados carregados!';
+    box.textContent = 'Dados carregados!';
     box.classList.add('visible');
   } catch (err) {
     // The error is intentionally re-thrown to the console so students can see it
     console.error(err);
-    box.innerHTML = `<span class="status-5xx">TypeError capturado!\nVeja o Console do DevTools para o stack trace completo.\n\n${err.message}</span>`;
+
+    box.textContent = '';
+    const span = document.createElement('span');
+    span.className = 'status-5xx';
+    span.textContent =
+      'TypeError capturado!\nVeja o Console do DevTools para o stack trace completo.\n\n' +
+      err.message;
+    box.appendChild(span);
     box.classList.add('visible');
   }
 }
@@ -157,9 +179,13 @@ async function scenarioSlow() {
   const btn = document.getElementById('btn-slow');
   const box = document.getElementById('res-slow');
 
-  btn.innerHTML = '<span class="spinner"></span>Aguardando resposta… (~8s)';
+  btn.textContent = '';
+  const spinner = document.createElement('span');
+  spinner.className = 'spinner';
+  btn.appendChild(spinner);
+  btn.appendChild(document.createTextNode('Aguardando resposta… (~8s)'));
   btn.disabled = true;
-  box.innerHTML = '⏳ Aguardando o servidor responder… observe a coluna "Time" na aba Network.';
+  box.textContent = '⏳ Aguardando o servidor responder… observe a coluna "Time" na aba Network.';
   box.classList.add('visible');
 
   try {
@@ -173,7 +199,7 @@ async function scenarioSlow() {
   } catch (err) {
     showError('res-slow', err.message);
   } finally {
-    btn.innerHTML = '▶ Reproduzir';
+    btn.textContent = '▶ Reproduzir';
     btn.disabled = false;
   }
 }
@@ -188,7 +214,7 @@ async function scenarioCookie() {
   // Bug injected: write an invalid session cookie value
   document.cookie = 'session=token-invalido-xyz; path=/';
 
-  box.innerHTML = 'Verificando sessão… (cookie inválido foi definido)';
+  box.textContent = 'Verificando sessão… (cookie inválido foi definido)';
   box.classList.add('visible');
 
   try {
@@ -223,10 +249,15 @@ function scenarioLocalStorage() {
       );
     }
 
-    box.innerHTML =
-      `<span class="status-warn">⚠ localStorage corrompido!\n\n` +
-      `Chave: userPrefs\nValor salvo:\n${JSON.stringify(prefs, null, 2)}\n\n` +
-      `Abra Application → Local Storage para ver e limpar o dado.</span>`;
+    box.textContent = '';
+    const span = document.createElement('span');
+    span.className = 'status-warn';
+    span.textContent =
+      '⚠ localStorage corrompido!\n\n' +
+      'Chave: userPrefs\nValor salvo:\n' +
+      JSON.stringify(prefs, null, 2) +
+      '\n\nAbra Application → Local Storage para ver e limpar o dado.';
+    box.appendChild(span);
     box.classList.add('visible');
   } catch (err) {
     showError('res-ls', err.message);
@@ -239,7 +270,7 @@ function scenarioLocalStorage() {
 // ---------------------------------------------------------------------------
 async function scenarioWarning() {
   const box = document.getElementById('res-warn');
-  box.innerHTML = 'Carregando configurações…';
+  box.textContent = 'Carregando configurações…';
   box.classList.add('visible');
 
   try {
@@ -258,10 +289,14 @@ async function scenarioWarning() {
     // App still works fine — just logs the warning
     console.info('[Debug Playground] Configurações carregadas com sucesso:', data);
 
-    box.innerHTML =
-      `<span class="status-warn">⚠ Warning emitido no Console (app ainda funciona)!\n\n` +
-      `Abra a aba Console e filtre por "Warnings" para ver a mensagem em amarelo.\n\n` +
-      `Resposta da API:\n${JSON.stringify(data, null, 2)}</span>`;
+    box.textContent = '';
+    const span = document.createElement('span');
+    span.className = 'status-warn';
+    span.textContent =
+      '⚠ Warning emitido no Console (app ainda funciona)!\n\n' +
+      'Abra a aba Console e filtre por "Warnings" para ver a mensagem em amarelo.\n\n' +
+      'Resposta da API:\n' + JSON.stringify(data, null, 2);
+    box.appendChild(span);
     box.classList.add('visible');
   } catch (err) {
     showError('res-warn', err.message);

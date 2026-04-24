@@ -12,6 +12,10 @@
   <header>
     <h1>🐛 Debug Playground</h1>
     <p>Ambiente de prática para aprender a usar o DevTools — Network, Console e Application.</p>
+    <div id="progress-indicator" class="progress-indicator" aria-live="polite">
+      <span id="progress-text">0 de 11 cenários explorados</span>
+      <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+    </div>
   </header>
 
   <main>
@@ -31,17 +35,18 @@
       <!-- ──────────────────────────────────────────────
            Card 1 — 500 Internal Server Error
            ────────────────────────────────────────────── -->
-      <div class="card danger">
+      <div class="card danger" data-card-id="500">
         <div class="card-header">
           <span class="badge">❌</span>
           <h2>Cadastro não salva</h2>
           <span class="code-label">500</span>
         </div>
         <p class="description">
-          O botão de cadastrar parece funcionar, mas o usuário nunca é salvo.
-          Abra a aba <strong>Network</strong> e clique em Reproduzir.
+          Preencha o formulário de cadastro e tente salvar. Mesmo com dados
+          válidos, o usuário nunca é salvo. Abra a aba <strong>Network</strong>
+          antes de confirmar.
         </p>
-        <button class="btn btn-danger" onclick="scenario500()">▶ Reproduzir</button>
+        <button class="btn btn-danger" onclick="scenario500()">▶ Abrir cadastro</button>
         <div id="res-500" class="response-box"></div>
         <button class="btn-reveal" onclick="toggleAnswer('ans-500')">👁 Ver resposta</button>
         <div id="ans-500" class="answer-section">
@@ -64,17 +69,18 @@
       <!-- ──────────────────────────────────────────────
            Card 2 — 422 Validation Error
            ────────────────────────────────────────────── -->
-      <div class="card warning">
+      <div class="card warning" data-card-id="422">
         <div class="card-header">
           <span class="badge">⚠️</span>
           <h2>Campo obrigatório ignorado</h2>
           <span class="code-label">422</span>
         </div>
         <p class="description">
-          O formulário envia sem e-mail. O servidor rejeita a requisição.
-          Abra <strong>Network</strong>, veja o payload e a resposta.
+          Um formulário sem validação no frontend: tente cadastrar deixando
+          o e-mail em branco e veja como o servidor reage.
+          Abra <strong>Network</strong> antes de confirmar.
         </p>
-        <button class="btn btn-warning" onclick="scenario422()">▶ Reproduzir</button>
+        <button class="btn btn-warning" onclick="scenario422()">▶ Abrir formulário</button>
         <div id="res-422" class="response-box"></div>
         <button class="btn-reveal" onclick="toggleAnswer('ans-422')">👁 Ver resposta</button>
         <div id="ans-422" class="answer-section">
@@ -97,17 +103,17 @@
       <!-- ──────────────────────────────────────────────
            Card 3 — 401 Unauthorized
            ────────────────────────────────────────────── -->
-      <div class="card danger">
+      <div class="card danger" data-card-id="401">
         <div class="card-header">
           <span class="badge">🔐</span>
           <h2>Usuário foi deslogado</h2>
           <span class="code-label">401</span>
         </div>
         <p class="description">
-          A tela de perfil não carrega. O token de sessão expirou.
-          Observe o header de autenticação na aba <strong>Network</strong>.
+          Tente carregar a tela de perfil. Observe o token usado no header
+          <code>Authorization</code> na aba <strong>Network</strong>.
         </p>
-        <button class="btn btn-danger" onclick="scenario401()">▶ Reproduzir</button>
+        <button class="btn btn-danger" onclick="scenario401()">▶ Abrir perfil</button>
         <div id="res-401" class="response-box"></div>
         <button class="btn-reveal" onclick="toggleAnswer('ans-401')">👁 Ver resposta</button>
         <div id="ans-401" class="answer-section">
@@ -130,17 +136,17 @@
       <!-- ──────────────────────────────────────────────
            Card 4 — 403 Forbidden
            ────────────────────────────────────────────── -->
-      <div class="card danger">
+      <div class="card danger" data-card-id="403">
         <div class="card-header">
           <span class="badge">🚫</span>
           <h2>Ação bloqueada pelo sistema</h2>
           <span class="code-label">403</span>
         </div>
         <p class="description">
-          O usuário tenta executar uma ação de administrador sem permissão.
+          Escolha um perfil e tente executar uma ação administrativa.
           Veja o status code na aba <strong>Network</strong>.
         </p>
-        <button class="btn btn-danger" onclick="scenario403()">▶ Reproduzir</button>
+        <button class="btn btn-danger" onclick="scenario403()">▶ Abrir painel admin</button>
         <div id="res-403" class="response-box"></div>
         <button class="btn-reveal" onclick="toggleAnswer('ans-403')">👁 Ver resposta</button>
         <div id="ans-403" class="answer-section">
@@ -162,7 +168,7 @@
       <!-- ──────────────────────────────────────────────
            Card 5 — JavaScript TypeError (frontend crash)
            ────────────────────────────────────────────── -->
-      <div class="card purple">
+      <div class="card purple" data-card-id="js">
         <div class="card-header">
           <span class="badge">💥</span>
           <h2>Tela quebra ao clicar</h2>
@@ -194,7 +200,7 @@
       <!-- ──────────────────────────────────────────────
            Card 6 — Slow Request / Timeout
            ────────────────────────────────────────────── -->
-      <div class="card info">
+      <div class="card info" data-card-id="slow">
         <div class="card-header">
           <span class="badge">🐢</span>
           <h2>Sistema muito lento</h2>
@@ -227,17 +233,17 @@
       <!-- ──────────────────────────────────────────────
            Card 7 — Cookie / Session Issue
            ────────────────────────────────────────────── -->
-      <div class="card warning">
+      <div class="card warning" data-card-id="cookie">
         <div class="card-header">
           <span class="badge">🍪</span>
           <h2>Sessão inválida (cookie)</h2>
           <span class="code-label">Cookie</span>
         </div>
         <p class="description">
-          O sistema perde a sessão do usuário. Verifique a aba
-          <strong>Application → Cookies</strong> e depois clique em Reproduzir.
+          Gerencie o cookie de sessão e verifique como o servidor responde.
+          Acompanhe pela aba <strong>Application → Cookies</strong>.
         </p>
-        <button class="btn btn-warning" onclick="scenarioCookie()">▶ Reproduzir</button>
+        <button class="btn btn-warning" onclick="scenarioCookie()">▶ Abrir gerenciador</button>
         <div id="res-cookie" class="response-box"></div>
         <button class="btn-reveal" onclick="toggleAnswer('ans-cookie')">👁 Ver resposta</button>
         <div id="ans-cookie" class="answer-section">
@@ -259,17 +265,17 @@
       <!-- ──────────────────────────────────────────────
            Card 8 — localStorage Corruption
            ────────────────────────────────────────────── -->
-      <div class="card warning">
+      <div class="card warning" data-card-id="ls">
         <div class="card-header">
           <span class="badge">📦</span>
           <h2>Dados estranhos salvos</h2>
           <span class="code-label">localStorage</span>
         </div>
         <p class="description">
-          O app salva preferências corrompidas no localStorage. O comportamento
-          fica estranho. Abra <strong>Application → Local Storage</strong>.
+          Abra o editor de preferências, veja os valores "estranhos" e salve.
+          Depois inspecione <strong>Application → Local Storage</strong>.
         </p>
-        <button class="btn btn-warning" onclick="scenarioLocalStorage()">▶ Reproduzir</button>
+        <button class="btn btn-warning" onclick="scenarioLocalStorage()">▶ Abrir preferências</button>
         <div id="res-ls" class="response-box"></div>
         <button class="btn-reveal" onclick="toggleAnswer('ans-ls')">👁 Ver resposta</button>
         <div id="ans-ls" class="answer-section">
@@ -291,7 +297,7 @@
       <!-- ──────────────────────────────────────────────
            Card 9 — Console Warning (non-breaking)
            ────────────────────────────────────────────── -->
-      <div class="card success">
+      <div class="card success" data-card-id="warn">
         <div class="card-header">
           <span class="badge">⚠️</span>
           <h2>Aviso no console (não quebra)</h2>
@@ -323,7 +329,7 @@
       <!-- ──────────────────────────────────────────────
            Card 10 — 404 Not Found
            ────────────────────────────────────────────── -->
-      <div class="card warning">
+      <div class="card warning" data-card-id="404">
         <div class="card-header">
           <span class="badge">🔎</span>
           <h2>Endpoint incorreto ou rota antiga</h2>
@@ -356,17 +362,18 @@
       <!-- ──────────────────────────────────────────────
            Card 11 — 429 Too Many Requests
            ────────────────────────────────────────────── -->
-      <div class="card danger">
+      <div class="card danger" data-card-id="429">
         <div class="card-header">
           <span class="badge">⏱</span>
           <h2>Muitas tentativas</h2>
           <span class="code-label">429</span>
         </div>
         <p class="description">
-          O app faz várias tentativas em sequência e o servidor bloqueia por excesso.
+          Abra a tela de login e tente entrar várias vezes. Cada clique
+          dispara uma tentativa e o servidor bloqueia após poucas repetições.
           Veja o status e os headers na aba <strong>Network</strong>.
         </p>
-        <button class="btn btn-danger" id="btn-429" onclick="scenario429()">▶ Reproduzir</button>
+        <button class="btn btn-danger" id="btn-429" onclick="scenario429()">▶ Abrir login</button>
         <div id="res-429" class="response-box"></div>
         <button class="btn-reveal" onclick="toggleAnswer('ans-429')">👁 Ver resposta</button>
         <div id="ans-429" class="answer-section">
@@ -402,6 +409,22 @@
     </div>
 
   </main>
+
+  <!-- ===== MODAL (reutilizável) ===== -->
+  <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" hidden>
+    <div class="modal" role="document">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button type="button" class="modal-close" aria-label="Fechar">×</button>
+      </div>
+      <div id="modal-tip" class="modal-tip" hidden></div>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST container ===== -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <script src="app.js"></script>
 </body>

@@ -49,6 +49,25 @@ function showError(elementId, message) {
 }
 
 /**
+ * Reads a response as JSON when possible, or returns a text preview.
+ * This keeps the card useful if the server returns HTML/plain text by mistake.
+ */
+async function readResponseBody(res) {
+  const contentType = res.headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    return res.json();
+  }
+
+  const text = await res.text();
+  return {
+    error: 'Resposta não JSON',
+    content_type: contentType || 'não informado',
+    body_preview: text.slice(0, 160),
+  };
+}
+
+/**
  * Toggles the visibility of an answer section.
  */
 function toggleAnswer(elementId) {
@@ -300,5 +319,63 @@ async function scenarioWarning() {
     box.classList.add('visible');
   } catch (err) {
     showError('res-warn', err.message);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Scenario 10 — 404 Not Found
+// GET /api/legacy-users — route does not exist anymore
+// ---------------------------------------------------------------------------
+async function scenario404() {
+  const box = document.getElementById('res-404');
+  box.textContent = 'Chamando endpoint antigo…';
+  box.classList.add('visible');
+
+  try {
+    const res = await fetch('/api/legacy-users');
+    const data = await readResponseBody(res);
+    showResponse('res-404', res.status, data);
+  } catch (err) {
+    showError('res-404', err.message);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Scenario 11 — 429 Too Many Requests
+// POST /api/login-attempt repeatedly until rate limit blocks the request
+// ---------------------------------------------------------------------------
+async function scenario429() {
+  const box = document.getElementById('res-429');
+  const btn = document.getElementById('btn-429');
+
+  btn.disabled = true;
+  box.textContent = 'Enviando várias tentativas rapidamente…';
+  box.classList.add('visible');
+
+  try {
+    let lastStatus = 0;
+    let lastData = {};
+
+    for (let attempt = 1; attempt <= 5; attempt += 1) {
+      const res = await fetch('/api/login-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'aluno@empresa.com', attempt }),
+      });
+
+      lastStatus = res.status;
+      lastData = await readResponseBody(res);
+
+      if (res.status === 429) {
+        lastData._tentativa_bloqueada = attempt;
+        break;
+      }
+    }
+
+    showResponse('res-429', lastStatus, lastData);
+  } catch (err) {
+    showError('res-429', err.message);
+  } finally {
+    btn.disabled = false;
   }
 }

@@ -320,6 +320,72 @@
         </div>
       </div>
 
+      <!-- ──────────────────────────────────────────────
+           Card 10 — 404 Not Found
+           ────────────────────────────────────────────── -->
+      <div class="card warning">
+        <div class="card-header">
+          <span class="badge">🔎</span>
+          <h2>Endpoint incorreto ou rota antiga</h2>
+          <span class="code-label">404</span>
+        </div>
+        <p class="description">
+          O frontend chama uma URL de API que não existe mais.
+          Abra <strong>Network</strong> e confira o caminho da requisição.
+        </p>
+        <button class="btn btn-warning" onclick="scenario404()">▶ Reproduzir</button>
+        <div id="res-404" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-404')">👁 Ver resposta</button>
+        <div id="ans-404" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O app chamou <code>GET /api/legacy-users</code>, mas essa rota não existe.</li>
+            <li>O servidor retornou <code>HTTP 404 Not Found</code>.</li>
+            <li>Onde olhar: <strong>Network</strong> → <em>Headers</em> para conferir URL e método.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Bom bug report:</strong>
+          <ul>
+            <li>Request: <code>GET /api/legacy-users</code></li>
+            <li>Status: <code>404</code></li>
+            <li>Response: <code>{"error":"Not Found"}</code></li>
+            <li>Hipótese: frontend usa rota antiga ou endpoint digitado incorretamente.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 11 — 429 Too Many Requests
+           ────────────────────────────────────────────── -->
+      <div class="card danger">
+        <div class="card-header">
+          <span class="badge">⏱</span>
+          <h2>Muitas tentativas</h2>
+          <span class="code-label">429</span>
+        </div>
+        <p class="description">
+          O app faz várias tentativas em sequência e o servidor bloqueia por excesso.
+          Veja o status e os headers na aba <strong>Network</strong>.
+        </p>
+        <button class="btn btn-danger" id="btn-429" onclick="scenario429()">▶ Reproduzir</button>
+        <div id="res-429" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-429')">👁 Ver resposta</button>
+        <div id="ans-429" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O endpoint aceitou algumas tentativas e depois bloqueou novas chamadas.</li>
+            <li>O servidor retornou <code>HTTP 429 Too Many Requests</code>.</li>
+            <li>Onde olhar: <strong>Network</strong> → <em>Headers</em> para ver limites e reset.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Bom bug report:</strong>
+          <ul>
+            <li>Request: <code>POST /api/login-attempt</code></li>
+            <li>Status: <code>429</code></li>
+            <li>Response: <code>{"error":"Too Many Requests"}</code></li>
+            <li>Comportamento: sistema bloqueia depois de muitas tentativas em pouco tempo.</li>
+          </ul>
+        </div>
+      </div>
+
     </div><!-- /challenges-grid -->
 
     <!-- ===== MINI CHECKLIST ===== -->

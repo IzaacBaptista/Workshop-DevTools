@@ -31,6 +31,8 @@ Abra [http://localhost:3000](http://localhost:3000) no navegador.
 | 7 | Sessão inválida (cookie) | Application → Cookies | 401 |
 | 8 | Dados estranhos salvos | Application → Local Storage | — |
 | 9 | Aviso no console (não quebra) | Console → filtro Warnings | warning |
+| 10 | Endpoint incorreto ou rota antiga | Network → Headers + Response | 404 |
+| 11 | Muitas tentativas | Network → Headers + Response | 429 |
 
 ---
 

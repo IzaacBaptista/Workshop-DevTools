@@ -22,8 +22,26 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+// Scenario-specific limiter so students can trigger 429 quickly.
+const tooManyRequestsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Too Many Requests',
+    message: 'Muitas tentativas em pouco tempo. Aguarde antes de tentar novamente.',
+  },
+});
+
 // Parse JSON request bodies
 app.use(express.json());
+
+// API responses should always be fresh in the DevTools exercises.
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 
 // Serve static frontend files from /public
 app.use(express.static(path.join(__dirname, 'public')));
@@ -138,6 +156,30 @@ app.get('/api/config', (req, res) => {
     theme: 'light',
     version: '1.0.0',
     deprecated_flag: true, // frontend will warn about this
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Scenario 10 — 429 Too Many Requests
+// POST /api/login-attempt
+// Simulates repeated attempts blocked by rate limiting.
+// ---------------------------------------------------------------------------
+app.post('/api/login-attempt', tooManyRequestsLimiter, (req, res) => {
+  res.json({
+    message: 'Tentativa registrada. Continue tentando para acionar o rate limit.',
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Scenario 11 — 404 Not Found
+// Any unknown /api route
+// Simulates a frontend calling an incorrect or old endpoint.
+// ---------------------------------------------------------------------------
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: 'Endpoint não encontrado. Verifique a URL, método HTTP ou versão da API.',
+    path: req.originalUrl,
   });
 });
 

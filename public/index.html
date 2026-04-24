@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debug Playground 🐛</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <h1>🐛 Debug Playground</h1>
+    <p>Ambiente de prática para aprender a usar o DevTools — Network, Console e Application.</p>
+  </header>
+
+  <main>
+
+    <!-- ===== INTRO ===== -->
+    <p style="margin-bottom:2rem; color:#4b5563; font-size:0.95rem;">
+      Cada card abaixo simula um problema real. Clique em <strong>▶ Reproduzir</strong>, observe o que aparece
+      no DevTools e tente diagnosticar o que aconteceu antes de clicar em
+      <strong>👁 Ver resposta</strong>.
+    </p>
+
+    <p class="section-title">🧪 Desafios de Debug</p>
+
+    <!-- ===== GRID ===== -->
+    <div class="challenges-grid">
+
+      <!-- ──────────────────────────────────────────────
+           Card 1 — 500 Internal Server Error
+           ────────────────────────────────────────────── -->
+      <div class="card danger">
+        <div class="card-header">
+          <span class="badge">❌</span>
+          <h2>Cadastro não salva</h2>
+          <span class="code-label">500</span>
+        </div>
+        <p class="description">
+          O botão de cadastrar parece funcionar, mas o usuário nunca é salvo.
+          Abra a aba <strong>Network</strong> e clique em Reproduzir.
+        </p>
+        <button class="btn btn-danger" onclick="scenario500()">▶ Reproduzir</button>
+        <div id="res-500" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-500')">👁 Ver resposta</button>
+        <div id="ans-500" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O servidor retornou <code>HTTP 500 Internal Server Error</code>.</li>
+            <li>Onde olhar: aba <strong>Network</strong> → clique na requisição → aba <strong>Response</strong>.</li>
+            <li>O corpo da resposta traz a mensagem de erro do servidor.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Exemplo de bom bug report:</strong>
+          <ul>
+            <li>Ação: clicar em "Salvar cadastro"</li>
+            <li>Request: <code>POST /api/users</code></li>
+            <li>Status: <code>500</code></li>
+            <li>Response: <code>{"error":"Erro interno ao salvar cliente"}</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 2 — 422 Validation Error
+           ────────────────────────────────────────────── -->
+      <div class="card warning">
+        <div class="card-header">
+          <span class="badge">⚠️</span>
+          <h2>Campo obrigatório ignorado</h2>
+          <span class="code-label">422</span>
+        </div>
+        <p class="description">
+          O formulário envia sem e-mail. O servidor rejeita a requisição.
+          Abra <strong>Network</strong>, veja o payload e a resposta.
+        </p>
+        <button class="btn btn-warning" onclick="scenario422()">▶ Reproduzir</button>
+        <div id="res-422" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-422')">👁 Ver resposta</button>
+        <div id="ans-422" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O campo <code>email</code> foi enviado vazio.</li>
+            <li>O servidor retornou <code>HTTP 422 Unprocessable Entity</code>.</li>
+            <li>Onde olhar: <strong>Network</strong> → <em>Payload</em> (corpo enviado) e <em>Response</em>.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Exemplo de bom bug report:</strong>
+          <ul>
+            <li>Request: <code>POST /api/users/validate</code></li>
+            <li>Payload enviado: <code>{"name":"João","email":""}</code></li>
+            <li>Status: <code>422</code></li>
+            <li>Response: <code>{"error":"Email is required"}</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 3 — 401 Unauthorized
+           ────────────────────────────────────────────── -->
+      <div class="card danger">
+        <div class="card-header">
+          <span class="badge">🔐</span>
+          <h2>Usuário foi deslogado</h2>
+          <span class="code-label">401</span>
+        </div>
+        <p class="description">
+          A tela de perfil não carrega. O token de sessão expirou.
+          Observe o header de autenticação na aba <strong>Network</strong>.
+        </p>
+        <button class="btn btn-danger" onclick="scenario401()">▶ Reproduzir</button>
+        <div id="res-401" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-401')">👁 Ver resposta</button>
+        <div id="ans-401" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O token enviado no header <code>Authorization</code> está expirado/inválido.</li>
+            <li>O servidor retornou <code>HTTP 401 Unauthorized</code>.</li>
+            <li>Onde olhar: <strong>Network</strong> → <em>Headers</em> (veja o token enviado) → <em>Response</em>.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Bom bug report:</strong>
+          <ul>
+            <li>Request: <code>GET /api/profile</code></li>
+            <li>Header: <code>Authorization: Bearer token-expirado</code></li>
+            <li>Status: <code>401</code></li>
+            <li>Response: <code>{"message":"Sessão expirada. Faça login novamente."}</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 4 — 403 Forbidden
+           ────────────────────────────────────────────── -->
+      <div class="card danger">
+        <div class="card-header">
+          <span class="badge">🚫</span>
+          <h2>Ação bloqueada pelo sistema</h2>
+          <span class="code-label">403</span>
+        </div>
+        <p class="description">
+          O usuário tenta executar uma ação de administrador sem permissão.
+          Veja o status code na aba <strong>Network</strong>.
+        </p>
+        <button class="btn btn-danger" onclick="scenario403()">▶ Reproduzir</button>
+        <div id="res-403" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-403')">👁 Ver resposta</button>
+        <div id="ans-403" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O servidor reconheceu o usuário (diferente do 401), mas negou a ação.</li>
+            <li>Retornou <code>HTTP 403 Forbidden</code>.</li>
+            <li>Diferença chave: <strong>401</strong> = não autenticado · <strong>403</strong> = sem permissão.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Bom bug report:</strong>
+          <ul>
+            <li>Request: <code>DELETE /api/admin/action</code></li>
+            <li>Status: <code>403</code></li>
+            <li>Response: <code>{"message":"Você não tem permissão para realizar esta ação."}</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 5 — JavaScript TypeError (frontend crash)
+           ────────────────────────────────────────────── -->
+      <div class="card purple">
+        <div class="card-header">
+          <span class="badge">💥</span>
+          <h2>Tela quebra ao clicar</h2>
+          <span class="code-label">JS Error</span>
+        </div>
+        <p class="description">
+          O botão dispara um erro JavaScript antes de chamar qualquer API.
+          Abra a aba <strong>Console</strong> — não a Network!
+        </p>
+        <button class="btn btn-purple" onclick="scenarioJSError()">▶ Reproduzir</button>
+        <div id="res-js" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-js')">👁 Ver resposta</button>
+        <div id="ans-js" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>Um <code>TypeError: Cannot read properties of undefined</code> foi lançado no JavaScript.</li>
+            <li>Nenhuma requisição de rede foi feita — olhar na Network não ajuda aqui.</li>
+            <li>Onde olhar: aba <strong>Console</strong> (erros em vermelho).</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Bom bug report:</strong>
+          <ul>
+            <li>Console mostra: <code>TypeError: Cannot read properties of undefined (reading 'nome')</code></li>
+            <li>Nenhuma requisição aparece na Network.</li>
+            <li>O erro ocorre ao clicar no botão "Reproduzir" do Desafio 5.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 6 — Slow Request / Timeout
+           ────────────────────────────────────────────── -->
+      <div class="card info">
+        <div class="card-header">
+          <span class="badge">🐢</span>
+          <h2>Sistema muito lento</h2>
+          <span class="code-label">Timing</span>
+        </div>
+        <p class="description">
+          A página demora para carregar os dados. Observe o tempo na coluna
+          <strong>Time</strong> da aba Network (aguarde ~8 segundos).
+        </p>
+        <button class="btn btn-info" id="btn-slow" onclick="scenarioSlow()">▶ Reproduzir</button>
+        <div id="res-slow" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-slow')">👁 Ver resposta</button>
+        <div id="ans-slow" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O servidor demorou ~8 segundos para responder.</li>
+            <li>Onde olhar: <strong>Network</strong> → coluna <em>Time</em> (waterfall).</li>
+            <li>Dica extra: use a <em>throttling</em> do DevTools para simular conexões lentas.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Bom bug report:</strong>
+          <ul>
+            <li>Request: <code>GET /api/slow</code></li>
+            <li>Status: <code>200</code> (mas tardio)</li>
+            <li>Tempo de resposta: <strong>~8 000 ms</strong></li>
+            <li>Captura de tela do waterfall anexada.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 7 — Cookie / Session Issue
+           ────────────────────────────────────────────── -->
+      <div class="card warning">
+        <div class="card-header">
+          <span class="badge">🍪</span>
+          <h2>Sessão inválida (cookie)</h2>
+          <span class="code-label">Cookie</span>
+        </div>
+        <p class="description">
+          O sistema perde a sessão do usuário. Verifique a aba
+          <strong>Application → Cookies</strong> e depois clique em Reproduzir.
+        </p>
+        <button class="btn btn-warning" onclick="scenarioCookie()">▶ Reproduzir</button>
+        <div id="res-cookie" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-cookie')">👁 Ver resposta</button>
+        <div id="ans-cookie" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O cookie <code>session</code> está ausente ou com valor inválido.</li>
+            <li>Onde olhar: aba <strong>Application</strong> → <em>Storage → Cookies</em>.</li>
+            <li>O servidor retornou <code>401</code> indicando sessão inválida.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Bom bug report:</strong>
+          <ul>
+            <li>Comportamento: usuário aparece como deslogado sem ter feito logout.</li>
+            <li>Cookie <code>session</code> ausente na aba Application.</li>
+            <li>Request: <code>GET /api/session-check</code> → Status: <code>401</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 8 — localStorage Corruption
+           ────────────────────────────────────────────── -->
+      <div class="card warning">
+        <div class="card-header">
+          <span class="badge">📦</span>
+          <h2>Dados estranhos salvos</h2>
+          <span class="code-label">localStorage</span>
+        </div>
+        <p class="description">
+          O app salva preferências corrompidas no localStorage. O comportamento
+          fica estranho. Abra <strong>Application → Local Storage</strong>.
+        </p>
+        <button class="btn btn-warning" onclick="scenarioLocalStorage()">▶ Reproduzir</button>
+        <div id="res-ls" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-ls')">👁 Ver resposta</button>
+        <div id="ans-ls" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>O app salvou um valor inválido em <code>localStorage.userPrefs</code>.</li>
+            <li>Onde olhar: <strong>Application → Storage → Local Storage</strong>.</li>
+            <li>Para corrigir: selecione a chave <code>userPrefs</code> e delete-a.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Bom bug report:</strong>
+          <ul>
+            <li>Comportamento: tema do app não carrega corretamente.</li>
+            <li>Local Storage → <code>userPrefs</code>: <code>{"theme":"undefined","lang":null}</code></li>
+            <li>Corrección: limpar a chave no DevTools resolve imediatamente.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────
+           Card 9 — Console Warning (non-breaking)
+           ────────────────────────────────────────────── -->
+      <div class="card success">
+        <div class="card-header">
+          <span class="badge">⚠️</span>
+          <h2>Aviso no console (não quebra)</h2>
+          <span class="code-label">Warning</span>
+        </div>
+        <p class="description">
+          O app ainda funciona, mas o Console mostra um warning.
+          Aprenda a diferenciar <strong>warning</strong> de <strong>erro</strong>.
+        </p>
+        <button class="btn" style="background:#16a34a;color:#fff;" onclick="scenarioWarning()">▶ Reproduzir</button>
+        <div id="res-warn" class="response-box"></div>
+        <button class="btn-reveal" onclick="toggleAnswer('ans-warn')">👁 Ver resposta</button>
+        <div id="ans-warn" class="answer-section">
+          <strong>🔍 O que aconteceu?</strong>
+          <ul>
+            <li>A API retornou <code>deprecated_flag: true</code> — o frontend emitiu um <code>console.warn</code>.</li>
+            <li>O app continua funcionando normalmente (não é um erro crítico).</li>
+            <li>Onde olhar: aba <strong>Console</strong> → mensagens em <em>amarelo</em> = warnings.</li>
+          </ul>
+          <strong style="margin-top:0.6rem;">📝 Como diferenciar:</strong>
+          <ul>
+            <li><strong>Erro (vermelho)</strong>: quebra o fluxo, precisa de ação imediata.</li>
+            <li><strong>Warning (amarelo)</strong>: algo a melhorar, mas não bloqueia o usuário.</li>
+            <li><strong>Info (azul)</strong>: log informativo do sistema.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /challenges-grid -->
+
+    <!-- ===== MINI CHECKLIST ===== -->
+    <p class="section-title">✅ Checklist de Evidências</p>
+    <div class="checklist-box">
+      <h3>Antes de abrir um chamado, verifique:</h3>
+      <label><input type="checkbox" /> Abri a aba <strong>Console</strong> e li as mensagens de erro</label>
+      <label><input type="checkbox" /> Abri a aba <strong>Network</strong> e identifiquei a requisição com problema</label>
+      <label><input type="checkbox" /> Anotei o <strong>status code</strong> da requisição (200, 401, 403, 422, 500…)</label>
+      <label><input type="checkbox" /> Copiei o <strong>corpo da resposta</strong> (Response body)</label>
+      <label><input type="checkbox" /> Capturei a mensagem de <strong>erro no Console</strong> (se houver)</label>
+      <label><input type="checkbox" /> Verifiquei a aba <strong>Application</strong> (cookies e localStorage) se o comportamento foi estranho</label>
+      <label><input type="checkbox" /> Incluí <strong>print ou vídeo</strong> mostrando o DevTools aberto</label>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

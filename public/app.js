@@ -235,6 +235,7 @@ function openModal(config) {
     bodyEl,
     confirmBtn,
     onClose: config.onClose,
+    previouslyFocused: document.activeElement,
   };
 
   confirmBtn.addEventListener('click', async () => {
@@ -281,11 +282,15 @@ function openModal(config) {
 
 function closeModal() {
   if (!activeModal) return;
-  const { overlay, cleanup, onClose } = activeModal;
+  const { overlay, cleanup, onClose, previouslyFocused } = activeModal;
   overlay.hidden = true;
   overlay.setAttribute('aria-hidden', 'true');
   if (typeof cleanup === 'function') cleanup();
   activeModal = null;
+  // Restore focus to the element that opened the modal (a11y).
+  if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+    try { previouslyFocused.focus(); } catch (_e) { /* element may have been removed */ }
+  }
   if (typeof onClose === 'function') onClose();
 }
 
